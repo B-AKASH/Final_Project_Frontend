@@ -263,20 +263,30 @@ with st.sidebar:
     url="https://final-project-1-08eq.onrender.com"
 
     with st.expander("👤 PATIENT DETAILS", expanded=True):
-        st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px;">Enter patient id</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px; font-family:\'JetBrains Mono\';">PATIENT_IDENTIFIER</p>', unsafe_allow_html=True)
         pid = st.number_input("Patient ID", min_value=1, value=1001, label_visibility="collapsed")
-        if st.button(" SHOW", use_container_width=True, type="primary"):
+        if st.button(" FETCH RECORD", use_container_width=True, type="primary"):
             r = requests.post(url+"/analyze", json={"patient_id": pid})
             if r.status_code == 200:
                 st.session_state.result_data = r.json()
                 st.session_state.view = "patient"
                 st.rerun()
 
-    with st.expander("�️ DEBUG ASSISTANT", expanded=False):
+    with st.expander("🔍  INTELLIGENT INQUIRY", expanded=True):
+        st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px; font-family:\'JetBrains Mono\';">NATURAL_LANGUAGE_QUERY</p>', unsafe_allow_html=True)
+        query = st.text_area("Query", height=100, label_visibility="collapsed", placeholder="e.g., search for patients with high risk...")
+        if st.button(" EXECUTE SEARCH", use_container_width=True):
+            r = requests.post(url+"/hospital/inquiry", json={"query": query})
+            if r.status_code == 200:
+                st.session_state.result_data = r.json()
+                st.session_state.view = "inquiry"
+                st.rerun()
+
+    with st.expander("🛠️ SYSTEM DIAGNOSTICS", expanded=False):
         if st.session_state.result_data:
             st.code(st.session_state.result_data, language="json")
         else:
-            st.write("No data in result buffer.")
+            st.write("NO_ACTIVE_DATA_BUFFER")
 
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🧹 CLEAR", use_container_width=True):
