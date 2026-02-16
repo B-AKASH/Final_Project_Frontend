@@ -277,15 +277,11 @@ with st.sidebar:
                 st.session_state.view = "patient"
                 st.rerun()
 
-    with st.expander("🔍  INQUIRY", expanded=True):
-        st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px;">Natural language query</p>', unsafe_allow_html=True)
-        query = st.text_area("Query", height=100, label_visibility="collapsed", placeholder="e.g.,risk, patients name...")
-        if st.button(" SEARCH", use_container_width=True):
-            r = requests.post(url+"/hospital/inquiry", json={"query": query})
-            if r.status_code == 200:
-                st.session_state.result_data = r.json()
-                st.session_state.view = "inquiry"
-                st.rerun()
+    with st.expander("�️ DEBUG ASSISTANT", expanded=False):
+        if st.session_state.result_data:
+            st.code(st.session_state.result_data, language="json")
+        else:
+            st.write("No data in result buffer.")
 
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🧹 CLEAR", use_container_width=True):
@@ -322,10 +318,17 @@ if st.session_state.view == "welcome":
 # --------------------------------------------------
 elif st.session_state.view == "patient":
     data = st.session_state.get("result_data", {})
-    ps = data.get("patient_summary", {})
-    ds = data.get("decision_support", {"why": [], "llm_explanation": ""})
     
-    if not ps or not ds:
+    # --- HYBRID MAPPING (Robust against flat/nested backend) ---
+    if "patient_summary" in data:
+        ps = data["patient_summary"]
+        ds = data.get("decision_support", {})
+    else:
+        # Fallback for flat structure or malformed nested data
+        ps = data
+        ds = {}
+
+    if not ps:
         st.warning("⚠️ High-fidelity data not available for this record. Please try again.")
         st.session_state.view = "welcome"
         st.rerun()
