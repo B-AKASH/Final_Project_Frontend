@@ -371,8 +371,8 @@ elif st.session_state.view == "patient":
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
 <h2 style="margin:0; color:#0f172a; font-family:'Outfit';">CLINICAL CASE SUMMARY</h2>
 <div style="text-align:right;">
-<span style="font-size:0.8rem; color:#64748b;">RECORDED: {ps['visit_date']}</span><br>
-<span style="font-weight:700; color:#0ea5e9;">DOC-ID: AI-PX-{ps['patient_id']}</span>
+<span style="font-size:0.8rem; color:#64748b;">RECORDED: {ps.get('visit_date', 'N/A')}</span><br>
+<span style="font-weight:700; color:#0ea5e9;">DOC-ID: AI-PX-{ps.get('patient_id', 'N/A')}</span>
 </div>
 </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
