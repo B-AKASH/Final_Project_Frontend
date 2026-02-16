@@ -349,21 +349,21 @@ elif st.session_state.view == "patient":
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
         c1, c2, c3, c4 = st.columns(4)
-        c1.markdown(bio_card("Diagnosis", ps["diagnosis"], "🩺"), unsafe_allow_html=True)
-        c2.markdown(bio_card("Risk Level", ps["risk_level"], "⚠️"), unsafe_allow_html=True)
-        c3.markdown(bio_card("Care Priority", ps["care_priority"], "🏷️"), unsafe_allow_html=True)
+        c1.markdown(bio_card("Diagnosis", ps.get("diagnosis", "N/A"), "🩺"), unsafe_allow_html=True)
+        c2.markdown(bio_card("Risk Level", ps.get("risk_level", "N/A"), "⚠️"), unsafe_allow_html=True)
+        c3.markdown(bio_card("Care Priority", ps.get("care_priority", "N/A"), "🏷️"), unsafe_allow_html=True)
         c4.markdown(bio_card("Visit Date", ps.get("visit_date", "N/A"), "📅"), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
         # Medical Paper Style for Summary
         chronic_pills = []
-        if ps.get('diabetes') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Diabetes: {ps['diabetes']}</div>")
-        if ps.get('asthma') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Asthma: {ps['asthma']}</div>")
-        if ps.get('chronic_kidney_disease') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>CKD: {ps['chronic_kidney_disease']}</div>")
-        if ps.get('obesity') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Obesity: {ps['obesity']}</div>")
-        if ps.get('anemia') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Anemia: {ps['anemia']}</div>")
-        chronic_pills.append(f"<div class='metric-pill'>Smoking: {ps['smoking_status']}</div>")
+        if ps.get('diabetes') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Diabetes: {ps.get('diabetes')}</div>")
+        if ps.get('asthma') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Asthma: {ps.get('asthma')}</div>")
+        if ps.get('chronic_kidney_disease') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>CKD: {ps.get('chronic_kidney_disease')}</div>")
+        if ps.get('obesity') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Obesity: {ps.get('obesity')}</div>")
+        if ps.get('anemia') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Anemia: {ps.get('anemia')}</div>")
+        chronic_pills.append(f"<div class='metric-pill'>Smoking: {ps.get('smoking_status', 'N/A')}</div>")
         
         pills_html = "".join(chronic_pills)
         
@@ -379,8 +379,8 @@ elif st.session_state.view == "patient":
 <div>
 <h3 style="color:#1e293b; font-size:1rem; margin-bottom:10px;">PATIENT STATUS</h3>
 <p style="font-size:1rem; color:#334155;">
-Assessment for <b>{ps.get('patient_name', ps.get('name', 'Unknown'))}</b> ({ps['gender']}, {ps['age']}y) reveals a <b>{ps['risk_level'].lower()} risk</b> profile 
-with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>{ps['diagnosis']}</b>.
+Assessment for <b>{ps.get('patient_name', ps.get('name', 'Unknown'))}</b> ({ps.get('gender', 'N/A')}, {ps.get('age', '??')}y) reveals a <b>{str(ps.get('risk_level', 'low')).lower()} risk</b> profile 
+with <b>{str(ps.get('care_priority', 'normal')).lower()}</b> priority. The primary diagnosis is <b>{ps.get('diagnosis', 'N/A')}</b>.
 </p>
 </div>
 <div>
@@ -398,7 +398,7 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
         col_l, col_r = st.columns([1, 1.4])
         with col_l:
             st.markdown("### 🎯 CLINICAL RATIONALE")
-            for reason in ds["why"]:
+            for reason in ds.get("why", []):
                 st.markdown(f"""
                 <div class="reason-card">
                     <div style="color:#0ea5e9; font-size:1.2rem;">🔹</div>
@@ -409,7 +409,7 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
         with col_r:
             st.markdown("### 🧠 EXPERT ANALYSIS")
             consult_box_start()
-            st.markdown(ds["llm_explanation"])
+            st.markdown(ds.get("llm_explanation", "Medical analysis insight unavailable."))
             consult_box_end()
 
     with tab3:
@@ -483,7 +483,7 @@ elif st.session_state.view == "inquiry":
         st.markdown("### 📄 MATCHED PATIENT DATA")
         
         # Format the dataframe for clear presentation
-        df = pd.DataFrame(res["matched_records"])
+        df = pd.DataFrame(res.get("matched_records", []))
         
         # Select and order columns for professional look
         cols = [
