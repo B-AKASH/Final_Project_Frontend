@@ -19,79 +19,99 @@ st.set_page_config(
 # --------------------------------------------------
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --bg-dark: #020408;
-    --card-bg: rgba(13, 20, 38, 0.6);
+    --bg-dark: #010204;
+    --card-bg: rgba(6, 12, 26, 0.7);
     --accent-blue: #0ea5e9;
-    --accent-glow: rgba(14, 165, 233, 0.15);
-    --text-main: #f8fafc;
+    --accent-cyan: #22d3ee;
+    --accent-glow: rgba(14, 165, 233, 0.25);
+    --text-main: #f1f5f9;
     --text-dim: #94a3b8;
-    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(14, 165, 233, 0.15);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+/* Elite Scrollbar */
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #334155; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
 
 html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-main);
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
 }
 
 [data-testid="stSidebar"] {
-    background-color: #03060c;
+    background-color: #01040a;
     border-right: 1px solid var(--border-color);
 }
 
+/* Glassmorphism 2.0 */
 .glass-card {
     background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 28px;
+    backdrop-filter: blur(30px) saturate(180%);
+    border-radius: 28px;
+    padding: 32px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.6),
+        inset 0 0 20px rgba(14, 165, 233, 0.05);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    transform: translateY(-5px);
+    border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 20px var(--accent-glow);
 }
 
+/* Telemetry Bio-Cards */
 .bio-card {
-    background: rgba(255,255,255,0.03);
-    padding: 20px;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
+    background: rgba(14, 165, 233, 0.03);
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid rgba(14, 165, 233, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.bio-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
 }
 
 .bio-card:hover {
-    background: rgba(14, 165, 233, 0.05);
-    border-color: rgba(14, 165, 233, 0.3);
-    transform: scale(1.02);
+    background: rgba(14, 165, 233, 0.08);
+    border-color: var(--accent-blue);
+    transform: scale(1.05);
 }
 
-.bio-icon { font-size: 1.5rem; color: var(--accent-blue); filter: drop-shadow(0 0 8px var(--accent-glow)); }
-.bio-val { font-size: 1.8rem; font-weight: 700; color: #fff; }
-.bio-lbl { font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase; }
+.bio-icon { font-size: 1.8rem; color: var(--accent-cyan); filter: drop-shadow(0 0 12px var(--accent-glow)); }
+.bio-val { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--accent-glow); }
+.bio-lbl { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; }
 
+/* Clinical Command Header */
 .dash-header {
-    background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-    padding: 48px;
-    border-radius: 32px;
-    margin-bottom: 32px;
+    background: linear-gradient(135deg, #020617 0%, #010204 100%);
+    padding: 56px;
+    border-radius: 40px;
+    margin-bottom: 40px;
     border: 1px solid var(--border-color);
-    border-bottom: 3px solid var(--accent-blue);
+    border-bottom: 4px solid var(--accent-blue);
+    box-shadow: 0 20px 80px rgba(0,0,0,0.7);
     position: relative;
     overflow: hidden;
 }
@@ -99,105 +119,79 @@ html, body, [data-testid="stAppViewContainer"] {
 .dash-header::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent);
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at center, rgba(14, 165, 233, 0.05) 0%, transparent 60%);
     pointer-events: none;
 }
 
+/* Medical Paper Elite */
 .medical-paper {
     background: #ffffff;
-    color: #1e293b;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.1);
-    border-left: 6px solid #0ea5e9;
-    font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-}
-
-.reason-card {
-    background: rgba(14, 165, 233, 0.05);
-    border: 1px solid rgba(14, 165, 233, 0.15);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.2s ease;
-}
-
-.reason-card:hover {
-    background: rgba(14, 165, 233, 0.08);
-    transform: translateX(4px);
-}
-
-.consult-box {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 16px;
-    padding: 24px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.consult-box::before {
-    content: "AI ADVISORY";
-    position: absolute;
-    top: -10px;
-    left: 20px;
-    background: #0ea5e9;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 2px 10px;
+    padding: 40px;
     border-radius: 4px;
-    letter-spacing: 0.1em;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    position: relative;
+    border-top: 15px solid #1e293b;
+}
+
+.medical-paper::after {
+    content: 'CLINICAL VERIFIED';
+    position: absolute;
+    bottom: 20px; right: 20px;
+    border: 2px solid #e2e8f0;
+    padding: 5px 12px;
+    font-size: 0.6rem;
+    font-weight: 900;
+    color: #94a3b8;
+    transform: rotate(-15deg);
+    opacity: 0.5;
+}
+
+/* Scanning Animation */
+@keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.scan-line {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(transparent, var(--accent-blue), transparent);
+    opacity: 0.3;
+    animation: scan 3s linear infinite;
+    pointer-events: none;
 }
 
 .intel-brief {
-    background: linear-gradient(135deg, rgba(8, 12, 22, 0.8) 0%, rgba(13, 19, 32, 0.8) 100%);
+    background: #020617;
     color: #f8fafc;
-    border-radius: 16px;
-    padding: 32px;
-    border: 1px solid rgba(14, 165, 233, 0.2);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    border-radius: 24px;
+    padding: 40px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 50px rgba(14, 165, 233, 0.1);
     position: relative;
     overflow: hidden;
 }
 
-.intel-brief::before {
-    content: "SECURE ANALYTIC FEED";
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 0.6rem;
-    font-weight: 800;
-    color: rgba(14, 165, 233, 0.5);
-    letter-spacing: 0.2rem;
+.reason-card {
+    background: rgba(255,255,255,0.02);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--accent-blue);
 }
-
-.data-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.data-label { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05rem; }
-.data-value { color: #f8fafc; font-weight: 600; }
 
 .metric-pill {
     display: inline-block;
-    padding: 6px 14px;
-    border-radius: 10px;
+    padding: 8px 16px;
+    border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 700;
-    border: 1px solid rgba(14, 165, 233, 0.2);
-    background: rgba(14, 165, 233, 0.05);
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    background: rgba(14, 165, 233, 0.1);
     color: #0f172a;
     margin: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -214,20 +208,21 @@ def glass_card_end():
 def intel_brief_start(session_id, source_count):
     st.markdown(f"""
     <div class="intel-brief">
-        <div style="border-left: 4px solid #0ea5e9; padding-left: 20px; margin-bottom: 25px;">
+        <div class="scan-line"></div>
+        <div style="border-left: 4px solid #0ea5e9; padding-left: 20px; margin-bottom: 25px; position:relative; z-index:1;">
             <h3 style="margin:0; font-family:'Outfit'; color:#fff; letter-spacing:0.05rem;">AGENT INTELLIGENCE SYNTHESIS</h3>
-            <p style="color:#94a3b8; font-size:0.9rem; margin:5px 0 0 0;">CROSS-RECORD ANALYTIC REPORT • SESSION ID {session_id}</p>
+            <p style="color:#94a3b8; font-family:'JetBrains Mono'; font-size:0.8rem; margin:5px 0 0 0;">📡 SECURE UPLINK ACTIVE • SESSION ID PX-{session_id}</p>
         </div>
-        <div style="background:rgba(0,0,0,0.2); border-radius:12px; padding:20px; border:1px solid rgba(255,255,255,0.03); margin-bottom:25px;">
+        <div style="background:rgba(0,0,0,0.4); border-radius:12px; padding:25px; border:1px solid rgba(255,255,255,0.05); margin-bottom:25px; position:relative; z-index:1;">
     """, unsafe_allow_html=True)
 
 def intel_brief_end(source_count):
     st.markdown(f"""
         </div>
-        <div style="display:flex; gap:15px;">
-            <div class="metric-pill">📡 SOURCES: {source_count}</div>
-            <div class="metric-pill">🔒 SECURITY: LEVEL-4</div>
-            <div class="metric-pill">⚙️ ENGINE: RAG-GPT4-LATEST</div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; position:relative; z-index:1;">
+            <div class="metric-pill" style="color:#f8fafc; border-color:rgba(255,255,255,0.1); background:rgba(255,255,255,0.05)">📡 SOURCES: {source_count}</div>
+            <div class="metric-pill" style="color:#0ea5e9; border-color:var(--accent-blue); background:rgba(14, 165, 233, 0.1)">🔒 SECURITY: ENCRYPTED-L5</div>
+            <div class="metric-pill" style="color:#22d3ee; border-color:#22d3ee; background:rgba(34, 211, 238, 0.1)">⚡ ENGINE: NEURAL-RAG-X</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -335,13 +330,15 @@ elif st.session_state.view == "patient":
 
     st.markdown(f"""
     <div class="dash-header">
-        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; position:relative; z-index:1;">
             <div>
-                <h1 style="margin:0; font-family:'Outfit'; font-weight:700;">{ps.get('patient_name', ps.get('name', 'Unknown'))}</h1>
-                <p style="color:#94a3b8; margin:4px 0 0 0;">PATIENT RECORD #{ps.get('patient_id', 'N/A')} • {ps.get('age', '??')} YEARS • {str(ps.get('gender', 'N/A')).upper()}</p>
+                <h1 style="margin:0; font-family:'Outfit'; font-weight:700; color:#fff; font-size:3rem; letter-spacing:-0.02em;">{ps.get('patient_name', ps.get('name', 'Unknown'))}</h1>
+                <p style="color:var(--accent-cyan); font-family:'JetBrains Mono'; margin:8px 0 0 0; letter-spacing:0.1em; font-weight:700;">
+                    <span style="opacity:0.6;">PATIENT_UID_</span>{ps.get('patient_id', 'N/A')} • {ps.get('age', '??')}Y • {str(ps.get('gender', 'N/A')).upper()}
+                </p>
             </div>
-            <div style="background:rgba(14, 165, 233, 0.1); padding:8px 16px; border-radius:12px; border:1px solid rgba(14, 165, 233, 0.2);">
-                <span style="color:#0ea5e9; font-weight:600; font-size:0.9rem;">LIVE STATUS: ACTIVE</span>
+            <div style="background:rgba(14, 165, 233, 0.15); padding:10px 20px; border-radius:14px; border:1px solid var(--accent-blue); backdrop-filter:blur(10px);">
+                <span style="color:var(--accent-cyan); font-weight:800; font-size:0.8rem; letter-spacing:0.1em; font-family:'JetBrains Mono';">📡 SYSTEM_STATUS: ENCRYPTED_SYNC</span>
             </div>
         </div>
     </div>
@@ -371,11 +368,12 @@ elif st.session_state.view == "patient":
         pills_html = "".join(chronic_pills)
         
         summary_html = f"""<div class="medical-paper">
+<div class="scan-line" style="background:linear-gradient(transparent, #cbd5e1, transparent); opacity:0.1; animation-duration:5s;"></div>
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
-<h2 style="margin:0; color:#0f172a; font-family:'Outfit';">CLINICAL CASE SUMMARY</h2>
-<div style="text-align:right;">
-<span style="font-size:0.8rem; color:#64748b;">RECORDED: {ps.get('visit_date', 'N/A')}</span><br>
-<span style="font-weight:700; color:#0ea5e9;">DOC-ID: AI-PX-{ps.get('patient_id', 'N/A')}</span>
+<h2 style="margin:0; color:#0f172a; font-family:'Outfit'; font-weight:800; letter-spacing:0.02em;">CLINICAL CASE SUMMARY</h2>
+<div style="text-align:right; font-family:'JetBrains Mono';">
+<span style="font-size:0.75rem; color:#64748b;">TIMESTAMP: {ps.get('visit_date', 'N/A')}</span><br>
+<span style="font-weight:700; color:#0ea5e9; font-size:0.85rem;">DOC: AGENT-AI-PX-{ps.get('patient_id', 'N/A')}</span>
 </div>
 </div>
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -424,12 +422,12 @@ with <b>{str(ps.get('care_priority', 'normal')).lower()}</b> priority. The prima
         
         st.markdown("<br>", unsafe_allow_html=True)
         glass_card_start()
-        st.markdown("### 📈 Longitudinal Vitals Trend")
+        st.markdown("### 📈 BIOMETRIC TELEMETRY DATA")
         chart = pd.DataFrame(
             np.random.randint(60, 160, size=(10, 2)),
             columns=["BP", "Heart Rate"]
         )
-        st.area_chart(chart)
+        st.area_chart(chart, use_container_width=True, color=["#0ea5e9", "#22d3ee"])
         glass_card_end()
 
     with tab4:
@@ -473,11 +471,11 @@ elif st.session_state.view == "inquiry":
 
     intel_brief_start(
         session_id=np.random.randint(100000, 999999), 
-        source_count=len(res.get('matched_records', [])) if res.get('matched_records') else 0
+        source_count=len(res.get('matched_records', []))
     )
     st.markdown(res.get("deep_explanation", "Analysis in progress or unavailable..."))
     intel_brief_end(
-        source_count=len(res.get('matched_records', [])) if res.get('matched_records') else 0
+        source_count=len(res.get('matched_records', []))
     )
 
     if res.get("matched_records"):
