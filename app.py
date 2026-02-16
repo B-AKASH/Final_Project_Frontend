@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import numpy as np
+import textwrap
 
 # --------------------------------------------------
 # PAGE CONFIG
@@ -185,6 +186,19 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .data-label { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05rem; }
 .data-value { color: #f8fafc; font-weight: 600; }
+
+.metric-pill {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    background: rgba(14, 165, 233, 0.05);
+    color: #0f172a;
+    margin: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -251,7 +265,7 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
 
-    url="https://final-project-1-08eq.onrender.com"
+    url="http://127.0.0.1:8000"
 
     with st.expander("👤 PATIENT DETAILS", expanded=True):
         st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px;">Enter patient id</p>', unsafe_allow_html=True)
@@ -304,7 +318,7 @@ if st.session_state.view == "welcome":
     glass_card_end()
 
 # --------------------------------------------------
-# PATIENT VIEW
+# PATIENT VIEW (ENHANCED)
 # --------------------------------------------------
 elif st.session_state.view == "patient":
     data = st.session_state.result_data
@@ -315,7 +329,7 @@ elif st.session_state.view == "patient":
     <div class="dash-header">
         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
             <div>
-                <h1 style="margin:0; font-family:'Outfit'; font-weight:700;">{ps['patient_name']}</h1>
+                <h1 style="margin:0; font-family:'Outfit'; font-weight:700;">{ps.get('patient_name', ps.get('name', 'Unknown'))}</h1>
                 <p style="color:#94a3b8; margin:4px 0 0 0;">PATIENT RECORD #{ps['patient_id']} • {ps['age']} YEARS • {ps['gender'].upper()}</p>
             </div>
             <div style="background:rgba(14, 165, 233, 0.1); padding:8px 16px; border-radius:12px; border:1px solid rgba(14, 165, 233, 0.2);">
@@ -325,7 +339,7 @@ elif st.session_state.view == "patient":
     </div>
     """, unsafe_allow_html=True)
 
-    tab1, tab2, tab3 = st.tabs(["📋 CLINICAL SUMMARY", "🧠 DECISION SUPPORT", "📊 TREND ANALYTICS"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 CLINICAL SUMMARY", "🧠 DECISION SUPPORT", "📊 VITALS & TRENDS", "💊 MEDICATION & INSURANCE"])
 
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
@@ -333,32 +347,46 @@ elif st.session_state.view == "patient":
         c1.markdown(bio_card("Diagnosis", ps["diagnosis"], "🩺"), unsafe_allow_html=True)
         c2.markdown(bio_card("Risk Level", ps["risk_level"], "⚠️"), unsafe_allow_html=True)
         c3.markdown(bio_card("Care Priority", ps["care_priority"], "🏷️"), unsafe_allow_html=True)
-        c4.markdown(bio_card("Blood Pressure", ps["blood_pressure"], "❤️"), unsafe_allow_html=True)
+        c4.markdown(bio_card("Visit Date", ps["visit_date"], "📅"), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
         # Medical Paper Style for Summary
-        st.markdown(f"""
-        <div class="medical-paper">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
-                <h2 style="margin:0; color:#0f172a; font-family:'Outfit';">CLINICAL CASE SUMMARY</h2>
-                <div style="text-align:right;">
-                    <span style="font-size:0.8rem; color:#64748b;">RECORDED: 2024-02-10</span><br>
-                    <span style="font-weight:700; color:#0ea5e9;">DOC-ID: AI-PX-{ps['patient_id']}</span>
-                </div>
-            </div>
-            <p style="font-size:1.1rem; color:#334155;">
-                Assessment for patient <b>{ps['patient_name']}</b> reveals a <b>{ps['risk_level'].lower()} risk</b> profile. 
-                The current diagnosis is <b>{ps['diagnosis']}</b>. Clinical indications suggest that <b>{ps['care_priority'].lower()}</b> 
-                monitoring is required at this stage.
-            </p>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <div class="metric-pill" style="color:#0f172a; border-color:#e2e8f0;">🧬 Genomic Match: High</div>
-                <div class="metric-pill" style="color:#0f172a; border-color:#e2e8f0;">🧪 Lab Sync: Complete</div>
-                <div class="metric-pill" style="color:#0f172a; border-color:#e2e8f0;">📌 Priority: {ps['care_priority']}</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        chronic_pills = []
+        if ps.get('diabetes') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Diabetes: {ps['diabetes']}</div>")
+        if ps.get('asthma') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Asthma: {ps['asthma']}</div>")
+        if ps.get('chronic_kidney_disease') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>CKD: {ps['chronic_kidney_disease']}</div>")
+        if ps.get('obesity') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Obesity: {ps['obesity']}</div>")
+        if ps.get('anemia') == 'Yes': chronic_pills.append(f"<div class='metric-pill'>Anemia: {ps['anemia']}</div>")
+        chronic_pills.append(f"<div class='metric-pill'>Smoking: {ps['smoking_status']}</div>")
+        
+        pills_html = "".join(chronic_pills)
+        
+        summary_html = f"""<div class="medical-paper">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:20px;">
+<h2 style="margin:0; color:#0f172a; font-family:'Outfit';">CLINICAL CASE SUMMARY</h2>
+<div style="text-align:right;">
+<span style="font-size:0.8rem; color:#64748b;">RECORDED: {ps['visit_date']}</span><br>
+<span style="font-weight:700; color:#0ea5e9;">DOC-ID: AI-PX-{ps['patient_id']}</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+<div>
+<h3 style="color:#1e293b; font-size:1rem; margin-bottom:10px;">PATIENT STATUS</h3>
+<p style="font-size:1rem; color:#334155;">
+Assessment for <b>{ps.get('patient_name', ps.get('name', 'Unknown'))}</b> ({ps['gender']}, {ps['age']}y) reveals a <b>{ps['risk_level'].lower()} risk</b> profile 
+with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>{ps['diagnosis']}</b>.
+</p>
+</div>
+<div>
+<h3 style="color:#1e293b; font-size:1rem; margin-bottom:10px;">CHRONIC CONDITIONS</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+{pills_html}
+</div>
+</div>
+</div>
+</div>"""
+        st.markdown(summary_html, unsafe_allow_html=True)
 
     with tab2:
         st.markdown("<br>", unsafe_allow_html=True)
@@ -380,8 +408,15 @@ elif st.session_state.view == "patient":
             consult_box_end()
 
     with tab3:
+        st.markdown("<br>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        c1.markdown(bio_card("Blood Pressure", ps["blood_pressure"], "❤️"), unsafe_allow_html=True)
+        c2.markdown(bio_card("Heart Rate", f"{ps['heart_rate']} bpm", "💓"), unsafe_allow_html=True)
+        c3.markdown(bio_card("Cholesterol", f"{ps['cholesterol']} mg/dL", "🧪"), unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         glass_card_start()
-        st.markdown("### � Longitudinal Vitals Trend")
+        st.markdown("### 📈 Longitudinal Vitals Trend")
         chart = pd.DataFrame(
             np.random.randint(60, 160, size=(10, 2)),
             columns=["BP", "Heart Rate"]
@@ -389,8 +424,29 @@ elif st.session_state.view == "patient":
         st.area_chart(chart)
         glass_card_end()
 
+    with tab4:
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            glass_card_start()
+            st.markdown("### 💊 MEDICATION PLAN")
+            st.markdown(f"""
+            <div class="data-row"><span class="data-label">Prescription</span><span class="data-value">{ps['medication']}</span></div>
+            <div class="data-row"><span class="data-label">Dosage</span><span class="data-value">{ps['dosage']}</span></div>
+            """, unsafe_allow_html=True)
+            glass_card_end()
+        
+        with col2:
+            glass_card_start()
+            st.markdown("### 🛡️ INSURANCE & BILLING")
+            st.markdown(f"""
+            <div class="data-row"><span class="data-label">Insurance Active</span><span class="data-value">{'✅ YES' if ps['has_insurance'] == 'True' else '❌ NO'}</span></div>
+            <div class="data-row"><span class="data-label">Plan Details</span><span class="data-value">{ps['insurance_plan'] if ps['insurance_plan'] else 'N/A'}</span></div>
+            """, unsafe_allow_html=True)
+            glass_card_end()
+
 # --------------------------------------------------
-# INQUIRY VIEW
+# INQUIRY VIEW (ENHANCED)
 # --------------------------------------------------
 elif st.session_state.view == "inquiry":
     res = st.session_state.result_data
@@ -414,7 +470,29 @@ elif st.session_state.view == "inquiry":
     if res.get("matched_records"):
         st.markdown("<br>", unsafe_allow_html=True)
         glass_card_start()
-        st.markdown("### 📄 MATCHED CLINICAL EVIDENCE")
+        st.markdown("### 📄 MATCHED PATIENT DATA")
+        
+        # Format the dataframe for clear presentation
         df = pd.DataFrame(res["matched_records"])
-        st.dataframe(df, use_container_width=True)
+        
+        # Select and order columns for professional look
+        cols = [
+            'patient_id', 'patient_name', 'age', 'gender', 'diagnosis', 'visit_date', 
+            'medication', 'dosage', 'risk_level', 'care_priority', 
+            'blood_pressure', 'heart_rate', 'cholesterol', 'diabetes', 
+            'asthma', 'chronic_kidney_disease', 'obesity', 'smoking_status', 'anemia',
+            'has_insurance', 'insurance_plan'
+        ]
+        # Only include columns that actually exist in the dataframe
+        available_cols = [c for c in cols if c in df.columns]
+        df = df[available_cols]
+        
+        # Professional column naming
+        df.columns = [c.replace('_', ' ').title() for c in df.columns]
+        
+        st.dataframe(
+            df, 
+            use_container_width=True,
+            hide_index=True,
+        )
         glass_card_end()
