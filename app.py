@@ -265,7 +265,7 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
 
-    url="http://127.0.0.1:8000"
+    url="https://final-project-1-08eq.onrender.com"
 
     with st.expander("👤 PATIENT DETAILS", expanded=True):
         st.markdown('<p style="font-size:0.8rem; color:#94a3b8; margin-bottom:8px;">Enter patient id</p>', unsafe_allow_html=True)
