@@ -248,12 +248,12 @@ def bio_card(label, value, icon):
     """
 
 # --------------------------------------------------
-# SESSION STATE
+# SESSION STATE (ROBUST INITIALIZATION)
 # --------------------------------------------------
 if "view" not in st.session_state:
     st.session_state.view = "welcome"
 if "result_data" not in st.session_state:
-    st.session_state.result_data = None
+    st.session_state.result_data = {}
 
 # --------------------------------------------------
 # SIDEBAR
@@ -321,16 +321,21 @@ if st.session_state.view == "welcome":
 # PATIENT VIEW (ENHANCED)
 # --------------------------------------------------
 elif st.session_state.view == "patient":
-    data = st.session_state.result_data
-    ps = data["patient_summary"]
-    ds = data["decision_support"]
+    data = st.session_state.get("result_data", {})
+    ps = data.get("patient_summary", {})
+    ds = data.get("decision_support", {"why": [], "llm_explanation": ""})
+    
+    if not ps or not ds:
+        st.warning("⚠️ High-fidelity data not available for this record. Please try again.")
+        st.session_state.view = "welcome"
+        st.rerun()
 
     st.markdown(f"""
     <div class="dash-header">
         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
             <div>
                 <h1 style="margin:0; font-family:'Outfit'; font-weight:700;">{ps.get('patient_name', ps.get('name', 'Unknown'))}</h1>
-                <p style="color:#94a3b8; margin:4px 0 0 0;">PATIENT RECORD #{ps['patient_id']} • {ps['age']} YEARS • {ps['gender'].upper()}</p>
+                <p style="color:#94a3b8; margin:4px 0 0 0;">PATIENT RECORD #{ps.get('patient_id', 'N/A')} • {ps.get('age', '??')} YEARS • {str(ps.get('gender', 'N/A')).upper()}</p>
             </div>
             <div style="background:rgba(14, 165, 233, 0.1); padding:8px 16px; border-radius:12px; border:1px solid rgba(14, 165, 233, 0.2);">
                 <span style="color:#0ea5e9; font-weight:600; font-size:0.9rem;">LIVE STATUS: ACTIVE</span>
@@ -347,7 +352,7 @@ elif st.session_state.view == "patient":
         c1.markdown(bio_card("Diagnosis", ps["diagnosis"], "🩺"), unsafe_allow_html=True)
         c2.markdown(bio_card("Risk Level", ps["risk_level"], "⚠️"), unsafe_allow_html=True)
         c3.markdown(bio_card("Care Priority", ps["care_priority"], "🏷️"), unsafe_allow_html=True)
-        c4.markdown(bio_card("Visit Date", ps["visit_date"], "📅"), unsafe_allow_html=True)
+        c4.markdown(bio_card("Visit Date", ps.get("visit_date", "N/A"), "📅"), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -410,9 +415,9 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
     with tab3:
         st.markdown("<br>", unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
-        c1.markdown(bio_card("Blood Pressure", ps["blood_pressure"], "❤️"), unsafe_allow_html=True)
-        c2.markdown(bio_card("Heart Rate", f"{ps['heart_rate']} bpm", "💓"), unsafe_allow_html=True)
-        c3.markdown(bio_card("Cholesterol", f"{ps['cholesterol']} mg/dL", "🧪"), unsafe_allow_html=True)
+        c1.markdown(bio_card("Blood Pressure", ps.get("blood_pressure", "N/A"), "❤️"), unsafe_allow_html=True)
+        c2.markdown(bio_card("Heart Rate", f"{ps.get('heart_rate', 'N/A')} bpm", "💓"), unsafe_allow_html=True)
+        c3.markdown(bio_card("Cholesterol", f"{ps.get('cholesterol', 'N/A')} mg/dL", "🧪"), unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         glass_card_start()
@@ -431,8 +436,8 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
             glass_card_start()
             st.markdown("### 💊 MEDICATION PLAN")
             st.markdown(f"""
-            <div class="data-row"><span class="data-label">Prescription</span><span class="data-value">{ps['medication']}</span></div>
-            <div class="data-row"><span class="data-label">Dosage</span><span class="data-value">{ps['dosage']}</span></div>
+            <div class="data-row"><span class="data-label">Prescription</span><span class="data-value">{ps.get('medication', 'N/A')}</span></div>
+            <div class="data-row"><span class="data-label">Dosage</span><span class="data-value">{ps.get('dosage', 'N/A')}</span></div>
             """, unsafe_allow_html=True)
             glass_card_end()
         
@@ -440,8 +445,8 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
             glass_card_start()
             st.markdown("### 🛡️ INSURANCE & BILLING")
             st.markdown(f"""
-            <div class="data-row"><span class="data-label">Insurance Active</span><span class="data-value">{'✅ YES' if ps['has_insurance'] == 'True' else '❌ NO'}</span></div>
-            <div class="data-row"><span class="data-label">Plan Details</span><span class="data-value">{ps['insurance_plan'] if ps['insurance_plan'] else 'N/A'}</span></div>
+            <div class="data-row"><span class="data-label">Insurance Active</span><span class="data-value">{'✅ YES' if ps.get('has_insurance') == 'True' else '❌ NO'}</span></div>
+            <div class="data-row"><span class="data-label">Plan Details</span><span class="data-value">{ps.get('insurance_plan', 'N/A')}</span></div>
             """, unsafe_allow_html=True)
             glass_card_end()
 
@@ -449,7 +454,12 @@ with <b>{ps['care_priority'].lower()}</b> priority. The primary diagnosis is <b>
 # INQUIRY VIEW (ENHANCED)
 # --------------------------------------------------
 elif st.session_state.view == "inquiry":
-    res = st.session_state.result_data
+    res = st.session_state.get("result_data", {})
+    
+    if not res:
+        st.warning("⚠️ Intelligent inquiry context lost. Please search again.")
+        st.session_state.view = "welcome"
+        st.rerun()
 
     st.markdown("""
     <div class="dash-header">
@@ -462,7 +472,7 @@ elif st.session_state.view == "inquiry":
         session_id=np.random.randint(100000, 999999), 
         source_count=len(res.get('matched_records', [])) if res.get('matched_records') else 0
     )
-    st.markdown(res["deep_explanation"])
+    st.markdown(res.get("deep_explanation", "Analysis in progress or unavailable..."))
     intel_brief_end(
         source_count=len(res.get('matched_records', [])) if res.get('matched_records') else 0
     )
