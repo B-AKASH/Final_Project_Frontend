@@ -282,11 +282,8 @@ with st.sidebar:
                 st.session_state.view = "inquiry"
                 st.rerun()
 
-    with st.expander("🛠️ SYSTEM DIAGNOSTICS", expanded=False):
-        if st.session_state.result_data:
-            st.code(st.session_state.result_data, language="json")
-        else:
-            st.write("NO_ACTIVE_DATA_BUFFER")
+    
+        
 
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🧹 CLEAR", use_container_width=True):
