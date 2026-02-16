@@ -444,17 +444,36 @@ with <b>{str(ps.get('care_priority', 'normal')).lower()}</b> priority. The prima
             glass_card_start()
             st.markdown("### 💊 MEDICATION PLAN")
             st.markdown(f"""
-            <div class="data-row"><span class="data-label">Prescription</span><span class="data-value">{ps.get('medication', 'N/A')}</span></div>
-            <div class="data-row"><span class="data-label">Dosage</span><span class="data-value">{ps.get('dosage', 'N/A')}</span></div>
+            <div style="background:rgba(14, 165, 233, 0.05); padding:20px; border-radius:15px; border:1px solid rgba(14, 165, 233, 0.1); margin-top:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+                    <span style="color:#94a3b8; font-size:0.8rem; letter-spacing:0.05em; font-family:'JetBrains Mono';">PRESCRIPTION</span>
+                    <span style="color:#fff; font-weight:700; font-family:'Outfit';">{ps.get('medication', 'N/A')}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#94a3b8; font-size:0.8rem; letter-spacing:0.05em; font-family:'JetBrains Mono';">DOSAGE_REGIMEN</span>
+                    <span style="color:#0ea5e9; font-weight:800; font-family:'JetBrains Mono';">{ps.get('dosage', 'N/A')}</span>
+                </div>
+            </div>
             """, unsafe_allow_html=True)
             glass_card_end()
         
         with col2:
             glass_card_start()
             st.markdown("### 🛡️ INSURANCE & BILLING")
+            active_status = "✅ ACTIVE" if ps.get('has_insurance') == 'True' else "❌ INACTIVE"
+            status_color = "#22c55e" if ps.get('has_insurance') == 'True' else "#ef4444"
+            
             st.markdown(f"""
-            <div class="data-row"><span class="data-label">Insurance Active</span><span class="data-value">{'✅ YES' if ps.get('has_insurance') == 'True' else '❌ NO'}</span></div>
-            <div class="data-row"><span class="data-label">Plan Details</span><span class="data-value">{ps.get('insurance_plan', 'N/A')}</span></div>
+            <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.05); margin-top:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+                    <span style="color:#94a3b8; font-size:0.8rem; letter-spacing:0.05em; font-family:'JetBrains Mono';">COVERAGE_STATUS</span>
+                    <span style="color:{status_color}; font-weight:800; font-family:'JetBrains Mono';">{active_status}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:#94a3b8; font-size:0.8rem; letter-spacing:0.05em; font-family:'JetBrains Mono';">PLAN_DESIGNATION</span>
+                    <span style="color:#fff; font-weight:700; font-family:'Outfit';">{ps.get('insurance_plan', 'N/A')}</span>
+                </div>
+            </div>
             """, unsafe_allow_html=True)
             glass_card_end()
 
